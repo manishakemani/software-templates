@@ -1,8 +1,9 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: ${{values.arifact_id}}
+  name: my-springboot-template
+  description: A template for creating a new Spring Boot application instance inside a folder
 spec:
   type: folder
-  lifecycle: experimental
-  owner: ${{values.owner}}
+  owner: my-team
+  lifecycle: production
