@@ -4,6 +4,6 @@ metadata:
   name: my-springboot-template
   description: A template for creating a new Spring Boot application instance inside a folder
 spec:
-  type: folder
+  type: service
   owner: my-team
   lifecycle: production
