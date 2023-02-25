@@ -1,7 +1,7 @@
 apiVersion: backstage.io//v1beta3
 kind: Component
 metadata:
-  name: ${{values.component_id | dump}}
+  name: microservice-template
   annotations:
     github.com/project-slug: ${{values.destination.owner + "/" + values.destination.repo}}
     backstage.io/techdocs-ref: dir:.
