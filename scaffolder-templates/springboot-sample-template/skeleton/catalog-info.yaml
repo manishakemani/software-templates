@@ -6,4 +6,4 @@ metadata:
 spec:
   type: service
   owner: my-team
-  lifecycle: production
+  lifecycle: experimental
