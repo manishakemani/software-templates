@@ -2,11 +2,12 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: springboot-template
-  title: Spring Boot Service
-  description: Create a simple microservice using Spring Boot Java
+  title: Spring Boot gRPC Service
+  description: Create a simple microservice using gRPC and Spring Boot Java
   tags:
     - recommended
     - java
+    - spring
 spec:
   owner: service@example.com
   type: service
@@ -23,10 +24,18 @@ spec:
           type: string
           description: Unique name of the component
           ui:field: EntityNamePicker
+        java_package_name:
+          title: Java Package Name
+          type: string
+          description: Name for the java package. eg (io.backstage.blah)
         description:
           title: Description
           type: string
           description: Help others understand what this website is for.
+        awsSecretManager:
+          title: AWS Secret Manager
+          type: string
+          description: Add your secret manager repo if exists.
         owner:
           title: Owner
           type: string
@@ -35,10 +44,6 @@ spec:
           ui:options:
             allowedKinds:
               - Group
-        awsSecretManager:
-          title: AWS Secrets Manager
-          type: string
-          ui:field: awsSecretRepo
     - title: Choose a location
       required:
         - repoUrl
@@ -63,6 +68,8 @@ spec:
           component_id: ${{ parameters.component_id }}
           description: ${{ parameters.description }}
           artifact_id: ${{ parameters.component_id }}
+          aws_secret_manager: ${{ parameters.awsSecretManager }}
+          java_package_name: ${{ parameters.java_package_name }}
           owner: ${{ parameters.owner }}
           destination: ${{ parameters.repoUrl | parseRepoUrl }}
           http_port: 8080
@@ -71,7 +78,7 @@ spec:
       name: Publish
       action: publish:github
       input:
-        allowedHosts: ["github.com"]
+        allowedHosts: ['github.com']
         description: This is ${{ parameters.component_id }}
         repoUrl: ${{ parameters.repoUrl }}
 
@@ -80,27 +87,12 @@ spec:
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
-        catalogInfoPath: "/catalog-info.yaml"
+        catalogInfoPath: '/catalog-info.yaml'
 
-  targets:
-    - type: dir
-      title: src
-      path: "{{ folderName }}/{{ appName }}/src"
-    - type: dir
-      title: config
-      path: "{{ folderName }}/{{ appName }}/config"
-    - type: file
-      title: pom.xml
-      path: "{{ folderName }}/{{ appName }}/pom.xml"
-      content: |
-        <?xml version="1.0"?>
-        <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-          <modelVersion>4.0.0</modelVersion>
-          <groupId>com.example</groupId>
-          <artifactId>{{ appName }}</artifactId>
-          <version>0.0.1-SNAPSHOT</version>
-          <name>{{ appName }}</name>
-          <description>Demo project for Spring Boot</description>
-          <packaging>jar</packaging>
-          ...
-        </project>
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}
